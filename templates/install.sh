@@ -14,9 +14,4 @@ php bin/magento setup:install --base-url=http://magento.local/ \
 
 php bin/magento sample:deploy
 php bin/magento setup:upgrade
-php bin/magento setup:di:compile
-
-composer require doofinder/doofinder-magento2
-
-php bin/magento setup:upgrade
 php bin/magento deploy:mode:set production

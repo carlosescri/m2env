@@ -17,6 +17,12 @@ const fstat = util.promisify(fs.stat);
 const configPath = findUp.sync(['.m2envrc', '.m2env.json'])
 const config = configPath ? JSON.parse(fs.readFileSync(configPath)) : {};
 
+function checkConfig(config) {
+  if (!config.magento) {
+    throw new Error('Please, execute m2env init first!!!');
+  }
+}
+
 yargs
   .scriptName('m2env')
   .config(config)
@@ -44,18 +50,18 @@ yargs
         default: async (answers) => config.php || phpversion(answers.magento)
       },
       {
-        name: 'user',
+        name: 'username',
         type: 'input',
         message: 'Username',
         prefix: '[Magento Repository]',
-        default: config.user || undefined
+        default: config.username || undefined
       },
       {
-        name: 'pass',
+        name: 'password',
         type: 'password',
         message: 'Password',
         prefix: '[Magento Repository]',
-        default: config.pass || undefined
+        default: config.password || undefined
       }
     ];
 
@@ -88,20 +94,33 @@ yargs
       console.log('not saved!');
     }
   })
-  .command('build', 'Create a new Magento 2 Docker image.', noop, async (config) => {
+  .command('build', 'Create a new Magento 2 environment.', noop, async (config) => {
     try {
+      checkConfig(config);
       await nginx.build(config);
-      await project.build(config);
-      console.log('You can execute docker-compose up to start the environment!');
+      return await project.build(config);
     } catch (error) {
       console.log(error.message);
-      return false;
+      return 1;
     }
-
-    return true;
   })
-  .command('install', 'Install Magento 2 in a running project', noop, async (config) => {
-    return await project.install(config);
+  .command('install magento', 'Install Magento 2 in a running project', noop, async (config) => {
+    try {
+      checkConfig(config);
+      return await project.run('install.sh', config);
+    } catch (error) {
+      console.log(error.message);
+      return 1;
+    }
+  })
+  .command('install plugin <plugin>', 'Install Magento 2 in a running project', noop, async (config) => {
+    try {
+      checkConfig(config);
+      return await project.run(`install_plugin.sh ${config.plugin}`, config);
+    } catch (error) {
+      console.log(error.message);
+      return 1;
+    }
   })
   .demandCommand()
   .help()
