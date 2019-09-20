@@ -2,6 +2,11 @@
 
 CLI app to build Magento 2 Docker environments easily.
 
+## Requirements
+
+- Docker
+- A NodeJS supporting promises, async/await, promisify… I'm using v10.
+
 ## Installation
 
 1. Clone the repo and enter the directory
