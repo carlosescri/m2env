@@ -2,6 +2,7 @@
 
 const yargs = require('yargs');
 const nginx = require('../lib/nginx');
+const project = require('../lib/project');
 const versions = require('../lib/versions');
 
 yargs
@@ -21,7 +22,16 @@ yargs
     const magento = versions.clean(argv.magento);
     // TODO: validate magento version!
     // TODO: Use chalk and boxen for pretty output
-    const phpversion = versions.clean(argv.php, 2) || versions.phpversion(magento);
-    await nginx.buildImage(phpversion);
+    const php = versions.clean(argv.php, 2) || versions.phpversion(magento);
+
+    try {
+      await nginx.buildImage(php);
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+
+    await project.build(magento, php);
+    return true;
   })
   .argv;
