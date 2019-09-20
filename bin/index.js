@@ -17,11 +17,11 @@ yargs
         alias: 'php',
         describe: 'Version of PHP to use with format x.x .'
       })
-  }, (argv) => {
+  }, async (argv) => {
     const magento = versions.clean(argv.magento);
     // TODO: validate magento version!
     // TODO: Use chalk and boxen for pretty output
     const phpversion = versions.clean(argv.php, 2) || versions.phpversion(magento);
-    nginx.buildImage(phpversion);
+    await nginx.buildImage(phpversion);
   })
   .argv;
