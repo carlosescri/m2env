@@ -27,11 +27,12 @@ yargs
     try {
       await nginx.buildImage(php);
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
       return false;
     }
 
     await project.build(magento, php);
+
     return true;
   })
   .argv;
