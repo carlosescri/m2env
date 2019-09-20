@@ -17,8 +17,8 @@ yargs
   .scriptName('m2env')
   .config(config)
   .locale('en')
-  .command(['init', '$0'], 'Prepare current working directory to hold a Magento 2 environment.', noop, async () => {
-    const answers = await inquirer.prompt([
+  .command(['init', '$0'], 'Prepare current working directory to hold a Magento 2 environment.', noop, async (config) => {
+    let questions = [
       {
         name: 'magento',
         type: 'input',
@@ -46,8 +46,30 @@ yargs
         message: 'Password',
         prefix: '[Magento Repository]'
       }
-    ]);
-    fs.writeFileSync(`./.m2envrc`, JSON.stringify(answers, null, 2));
+    ];
+
+    const confirmation = {
+      name: 'save',
+      type: 'confirm',
+      message: 'Save config?',
+      default: false
+    }
+
+    if (config.magento) {
+      confirmation.message = `${confirmation.message} (this will overwrite any existing .m2envrc file!!!)`;
+    }
+
+    questions.push(confirmation)
+
+    const answers = await inquirer.prompt(questions);
+
+    if (answers.save) {
+      delete answers.save;
+      fs.writeFileSync(`./.m2envrc`, JSON.stringify(answers, null, 2));
+      console.log('saved!');
+    } else {
+      console.log('not saved!');
+    }
   })
   .command('build', 'Create a new Magento 2 Docker image.', noop, async (config) => {
     try {
