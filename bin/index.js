@@ -3,6 +3,8 @@
 const findUp = require('find-up');
 const fs = require('fs');
 const inquirer = require('inquirer');
+const path = require('path');
+const util = require('util');
 const yargs = require('yargs');
 
 const {clean, phpversion} = require('../lib/versions');
@@ -10,6 +12,8 @@ const nginx = require('../lib/nginx');
 const project = require('../lib/project');
 
 const noop = () => {};
+const fstat = util.promisify(fs.stat);
+
 const configPath = findUp.sync(['.m2envrc', '.m2env.json'])
 const config = configPath ? JSON.parse(fs.readFileSync(configPath)) : {};
 
@@ -17,7 +21,11 @@ yargs
   .scriptName('m2env')
   .config(config)
   .locale('en')
-  .command(['init', '$0'], 'Prepare current working directory to hold a Magento 2 environment.', noop, async (config) => {
+  .command('init [packages]', 'Prepare current working directory to hold a Magento 2 environment.', (yargs) => {
+    yargs.option('packages', {description: 'Configure a directory to install packages with Composer.', type: 'string', default: null})
+  }, async (config) => {
+    const overwrite = !!config.magento;
+
     let questions = [
       {
         name: 'magento',
@@ -25,6 +33,7 @@ yargs
         message: 'Magento version (x.y[.z])',
         filter: async (input) => clean(input),
         validate: async (input) => !!input,
+        default: config.magento || undefined
       },
       {
         name: 'php',
@@ -32,39 +41,47 @@ yargs
         message: 'PHP version (x[.y])',
         filter: async (input) => clean(input, 2),
         validate: async (input) => !!input,
-        default: async (answers) => phpversion(answers.magento)
+        default: async (answers) => config.php || phpversion(answers.magento)
       },
       {
         name: 'user',
         type: 'input',
         message: 'Username',
-        prefix: '[Magento Repository]'
+        prefix: '[Magento Repository]',
+        default: config.user || undefined
       },
       {
         name: 'pass',
         type: 'password',
         message: 'Password',
-        prefix: '[Magento Repository]'
+        prefix: '[Magento Repository]',
+        default: config.pass || undefined
       }
     ];
 
-    const confirmation = {
-      name: 'save',
-      type: 'confirm',
-      message: 'Save config?',
-      default: false
+    if (overwrite) {
+      questions.push({
+        name: 'save',
+        type: 'confirm',
+        message: 'Overwrite existing settings file?',
+        default: false
+      });
     }
-
-    if (config.magento) {
-      confirmation.message = `${confirmation.message} (this will overwrite any existing .m2envrc file!!!)`;
-    }
-
-    questions.push(confirmation)
 
     const answers = await inquirer.prompt(questions);
 
-    if (answers.save) {
+    if (answers.save || !overwrite) {
       delete answers.save;
+
+      if (config.packages) {
+        const dirinfo = await fstat(config.packages);
+        if (dirinfo.isDirectory()) {
+          answers.packages = path.resolve(config.packages);
+        } else {
+          console.warn('packages directory is not valid and will not be saved!');
+        }
+      }
+
       fs.writeFileSync(`./.m2envrc`, JSON.stringify(answers, null, 2));
       console.log('saved!');
     } else {
@@ -86,4 +103,6 @@ yargs
   .command('install', 'Install Magento 2 in a running project', noop, async (config) => {
     return await project.install(config);
   })
+  .demandCommand()
+  .help()
   .argv;

@@ -18,8 +18,11 @@ To uninstall run `npm uninstall -g .` from the project's directory.
 
 ```bash
 ~$ mkdir my_project && cd my_project
-my_project$ USER=… PASS=… m2env 2.3.2
+my_project$ m2env init [--packages /path/to/m2/plugins/dir]
+my_project$ m2env build
 my_project$ docker-compose up
+# wait… and in other shell when finishes…
+my_project$ m2env install
 ```
 
 **Notice:** `USER` and `PASS` are your username and password for the Magento 2 repo.
