@@ -1,0 +1,15 @@
+{
+  "name": "m2env",
+  "version": "1.0.0",
+  "description": "CLI app to build Magento 2 Docker environments easily.",
+  "main": "bin/index.js",
+  "author": "Carlos Escribano (<carlos@doofinder.com>)",
+  "license": "MIT",
+  "bin": {
+    "m2env": "./bin/index.js"
+  },
+  "dependencies": {
+    "semver": "^6.3.0",
+    "yargs": "^14.0.0"
+  }
+}
