@@ -3,7 +3,7 @@
 const yargs = require('yargs');
 const nginx = require('../lib/nginx');
 const project = require('../lib/project');
-const versions = require('../lib/versions');
+const {clean, phpversion} = require('../lib/versions');
 
 yargs
   .scriptName('m2env')
@@ -19,19 +19,31 @@ yargs
         describe: 'Version of PHP to use with format x.x .'
       })
   }, async (argv) => {
-    const magento = versions.clean(argv.magento);
+    const magento = clean(argv.magento);
     // TODO: validate magento version!
+
+    const versions = {
+      magento,
+      php: clean(argv.php, 2) || phpversion(magento)
+    };
+
     // TODO: Use chalk and boxen for pretty output
-    const php = versions.clean(argv.php, 2) || versions.phpversion(magento);
+
+    const auth = {
+      username: process.env.USER,
+      password: process.env.PASS
+    }
+
+    // TODO: validate credentials!!!
 
     try {
-      await nginx.buildImage(php);
+      await nginx.buildImage(versions.php);
     } catch (error) {
       console.log(error.message);
       return false;
     }
 
-    await project.build(magento, php);
+    await project.build(versions, auth);
 
     return true;
   })
