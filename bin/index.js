@@ -100,25 +100,25 @@ yargs
       await nginx.build(config);
       return await project.build(config);
     } catch (error) {
-      console.log(error.message);
+      console.log('error', error, error.message);
       return 1;
     }
   })
-  .command('install magento', 'Install Magento 2 in a running project', noop, async (config) => {
+  .command('install-magento', 'Install Magento 2 in a running project', noop, async (config) => {
     try {
       checkConfig(config);
       return await project.run('install.sh', config);
     } catch (error) {
-      console.log(error.message);
+      console.log('error', error, error.message);
       return 1;
     }
   })
-  .command('install plugin <plugin>', 'Install Magento 2 in a running project', noop, async (config) => {
+  .command('install-plugin <plugin>', 'Install Magento 2 in a running project', noop, async (config) => {
     try {
       checkConfig(config);
       return await project.run(`install_plugin.sh ${config.plugin}`, config);
     } catch (error) {
-      console.log(error.message);
+      console.log('error', error, error.message);
       return 1;
     }
   })
