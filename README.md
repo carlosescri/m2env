@@ -22,19 +22,11 @@ my_project$ m2env init [--packages /path/to/m2/plugins/dir]
 my_project$ m2env build
 my_project$ docker-compose up
 # wait… and in other shell when finishes…
-my_project$ m2env install
+my_project$ m2env install-magento
+# if you want to isntall a plugin…
+my_project$ m2env install-plugin doofinder/doofinder-magento2
 ```
-
-**Notice:** `USER` and `PASS` are your username and password for the Magento 2 repo.
-
-Access the `app` container to continue installing Magento 2:
-
-```bash
-my_project$ docker-compose exec app gosu application bash
-```
-
-To be continued…
 
 ## Credits
 
-99% of Docker stuff was provided by @magently (<https://www.magently.com/>).
+95% of Docker stuff was provided by @magently (<https://www.magently.com/>).
