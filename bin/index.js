@@ -50,6 +50,30 @@ yargs
         default: async (answers) => config.php || phpversion(answers.magento)
       },
       {
+        name: 'servername',
+        type: 'input',
+        message: 'Server Name',
+        default: async () => config.servername || 'magento.dev'
+      },
+      {
+        name: 'language',
+        type: 'input',
+        message: 'Language',
+        default: async () => config.language || 'en_US'
+      },
+      {
+        name: 'currency',
+        type: 'input',
+        message: 'Currency',
+        default: async () => config.currency || 'USD'
+      },
+      {
+        name: 'timezone',
+        type: 'input',
+        message: 'Timezone',
+        default: async () => config.timezone || 'America/Chicago'
+      },
+      {
         name: 'username',
         type: 'input',
         message: 'Username',
