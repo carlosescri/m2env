@@ -5,6 +5,7 @@ cd /app
 composer create-project --repository=https://repo.magento.com/ magento/project-community-edition:$MAGENTO_VERSION .
 
 jq '.repositories = [{"type": "path", "url": "/packages/*/*", "options": {"symlink": true}}, {"type": "composer", "url": "https://repo.magento.com/"}]' composer.json | sponge composer.json
+jq '."minimum-stability" = "beta"' composer.json | sponge composer.json
 
 php bin/magento setup:install --base-url=http://magento.localhost/ \
 --db-host=db --db-name=db --db-user=root --db-password=secret \
