@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
-cd /app
-
 # create magento project inside /app/magento preventing non-empty dir error due to /app/packages
-composer create-project --repository=https://repo.magento.com/ magento/project-community-edition:$MAGENTO_VERSION magento
+mkdir -p /app/magento
+cd /app/magento
+composer create-project --repository=https://repo.magento.com/ magento/project-community-edition:$MAGENTO_VERSION .
 
 # move project to /app
+cd /app
 shopt -s dotglob
 mv magento/* .
 shopt -u dotglob
