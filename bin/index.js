@@ -115,12 +115,18 @@ yargs
     if (answers.save || !overwrite) {
       delete answers.save;
 
-      if (config.packages) {
-        const dirinfo = await fstat(config.packages);
-        if (dirinfo.isDirectory()) {
-          answers.packages = path.resolve(config.packages);
-        } else {
-          console.warn('packages directory is not valid and will not be saved!');
+      if (answers.packages) {
+        let ok = false;
+        try {
+          const packagesdir = path.resolve(answers.packages);
+          const dirinfo = await fstat(answers.packages);
+          ok = dirinfo.isDirectory();
+        } catch(error) {
+        } finally {
+          if (!ok) {
+            answers.packages = null;
+            console.warn('packages directory is not valid and will not be saved!');
+          }
         }
       }
 
