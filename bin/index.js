@@ -27,9 +27,7 @@ yargs
   .scriptName('m2env')
   .config(config)
   .locale('en')
-  .command('init [packages]', 'Prepare current working directory to hold a Magento 2 environment.', (yargs) => {
-    yargs.option('packages', {description: 'Configure a directory to install packages with Composer.', type: 'string', default: null})
-  }, async (config) => {
+  .command('init', 'Prepare current working directory to hold a Magento 2 environment.', noop, async (config) => {
     const overwrite = !!config.magento;
 
     let questions = [
@@ -86,6 +84,20 @@ yargs
         message: 'Password',
         prefix: '[Magento Repository]',
         default: config.password || undefined
+      },
+      {
+        name: 'packages',
+        type: 'input',
+        message: 'Packages Directory',
+        prefix: '[Packages]',
+        default: null
+      },
+      {
+        name: 'composer',
+        type: 'input',
+        message: 'Composer Config Directory',
+        prefix: '[Packages]',
+        default: null
       }
     ];
 
