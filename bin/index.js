@@ -158,11 +158,14 @@ yargs
   .command('install-plugin <plugin>', 'Install Magento 2 in a running project', noop, async (config) => {
     try {
       checkConfig(config);
-      return await project.run(`install_plugin.sh ${config.plugin}`, config);
+      return await project.runScript(`install_plugin.sh ${config.plugin}`, config);
     } catch (error) {
       console.log('error', error, error.message);
       return 1;
     }
+  })
+  .command('refresh', 'Refreshes the installation by recompiling and deploying static files', noop, async (config) => {
+    return await project.runCommand(`php -d memory_limit=2G bin/magento deploy:mode:set production`, config);
   })
   .demandCommand()
   .help()
